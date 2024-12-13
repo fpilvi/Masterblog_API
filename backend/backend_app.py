@@ -10,6 +10,13 @@ POSTS_FILE = "posts.json"
 
 
 def read_posts():
+    """
+    Reads the list of posts from the JSON file.
+    If the file is not existing or is not valid, it returns empty list.
+
+    Returns:
+        List of posts.
+    """
     try:
         with open(POSTS_FILE, "r") as file:
             return json.load(file)
@@ -19,20 +26,41 @@ def read_posts():
         return []
 
 
-
 def write_posts(posts):
+    """
+        Writes a list of posts to the JSON file.
+
+        Args:
+            posts (list): List of posts to write to the file.
+        """
     with open(POSTS_FILE, "w") as file:
         json.dump(posts, file, indent=4)
 
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
+    """
+    Endpoint to fetch all the posts.
+    Reads the posts from the JSON file and returns them as a JSON response.
+
+    Returns:
+        Response: JSON array of posts.
+    """
     posts = read_posts()
     return jsonify(posts)
 
 
 @app.route('/api/posts', methods=['POST'])
 def add_post():
+    """
+    Endpoint to add new post.
+    Accepts a JSON payload containing 'title' and 'content', validates them,
+    and adds a new post to the JSON file.
+
+    Returns:
+        Response: JSON object of the created post with a 201 status code.
+        If 'title' or 'content' is missing, returns an error with a 400 status code.
+    """
     data = request.get_json()
 
     if not data or not data.get('title') or not data.get('content'):
@@ -57,6 +85,19 @@ def add_post():
 
 @app.route('/api/posts/<int:id>', methods=['PUT'])
 def update_post(id):
+    """
+    Endpoint to update an existing post.
+    Accepts a JSON payload with 'title' and 'content' and updates the post
+    with the given ID in the JSON file.
+
+    Args:
+        id (int): ID of the post to be updated.
+
+    Returns:
+        Response: JSON object of the updated post with a 200 status code.
+        If the post is not found, returns an error with a 404 status code.
+        If 'title' or 'content' is missing, returns an error with a 400 status code.
+    """
     posts = read_posts()
     post = next((post for post in posts if post['id'] == id), None)
     if post is None:
@@ -79,6 +120,17 @@ def update_post(id):
 
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
+    """
+        Endpoint to delete a post by its ID.
+        Removes the post with the given ID from the JSON file.
+
+        Args:
+            id (int): ID of the post to be deleted.
+
+        Returns:
+            Response: A success message with a 200 status code.
+            If the post is not found, returns an error with a 404 status code.
+        """
     posts = read_posts()
     post = next((post for post in posts if post['id'] == id), None)
     if post is None:
@@ -91,4 +143,7 @@ def delete_post(id):
 
 
 if __name__ == '__main__':
+    """
+       Starts the Flask application on host 0.0.0.0 and port 5002 in debug mode.
+       """
     app.run(host="0.0.0.0", port=5002, debug=True)
