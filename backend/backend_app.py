@@ -27,13 +27,17 @@ def read_posts():
 
 def write_posts(posts):
     """
-        Writes a list of posts to the JSON file.
+    Writes a list of posts to the JSON file.
 
-        Args:
-            posts (list): List of posts to write to the file.
-        """
-    with open(POSTS_FILE, "w") as file:
-        json.dump(posts, file, indent=4)
+    Args:
+        posts (list): List of posts to write to the file.
+    """
+    try:
+        with open(POSTS_FILE, "w") as file:
+            json.dump(posts, file, indent=4)
+    except Exception as e:
+        return jsonify({"error": f"Error writing to file: {str(e)}"}), 500
+
 
 
 @app.route('/api/posts', methods=['GET'])
@@ -55,9 +59,9 @@ def get_posts():
     posts = read_posts()
 
     if sort_field and sort_field not in ['title', 'content']:
-        return jsonify({"error": "Invalid sort field. Valid values are 'title' or 'content'."}), 400
+        return jsonify({"error": "Error. Valid values are 'title' or 'content'."}), 400
     if sort_direction and sort_direction not in ['asc', 'desc']:
-        return jsonify({"error": "Invalid direction. Valid values are 'asc' or 'desc'."}), 400
+        return jsonify({"error": "Error. Valid values are 'asc' or 'desc'."}), 400
 
     if sort_field and sort_direction:
         posts = sorted(posts, key=lambda post: post[sort_field].lower(), reverse=(sort_direction == 'desc'))
