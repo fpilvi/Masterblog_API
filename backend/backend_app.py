@@ -28,13 +28,21 @@ def read_posts():
 
 def write_posts(posts):
     """
-        Writes a list of posts to the JSON file.
+    Writes a list of posts to the JSON file.
 
-        Args:
-            posts (list): List of posts to write to the file.
-        """
-    with open(POSTS_FILE, "w") as file:
-        json.dump(posts, file, indent=4)
+    Args:
+        posts (list): List of posts to write to the file.
+
+    Returns:
+        bool: True if writing is successful, False otherwise.
+    """
+    try:
+        with open(POSTS_FILE, "w") as file:
+            json.dump(posts, file, indent=4)
+        return True
+    except Exception as e:
+        print(f"Error writing to {POSTS_FILE}: {e}")
+        return False
 
 
 @app.route('/api/posts', methods=['GET'])
