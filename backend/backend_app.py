@@ -8,6 +8,7 @@ CORS(app)
 POSTS_FILE = "posts.json"
 
 
+
 def read_posts():
     """
     Reads the list of posts from the JSON file.
@@ -27,44 +28,44 @@ def read_posts():
 
 def write_posts(posts):
     """
-    Writes a list of posts to the JSON file.
+        Writes a list of posts to the JSON file.
 
-    Args:
-        posts (list): List of posts to write to the file.
-    """
-    try:
-        with open(POSTS_FILE, "w") as file:
-            json.dump(posts, file, indent=4)
-    except Exception as e:
-        return jsonify({"error": f"Error writing to file: {str(e)}"}), 500
-
+        Args:
+            posts (list): List of posts to write to the file.
+        """
+    with open(POSTS_FILE, "w") as file:
+        json.dump(posts, file, indent=4)
 
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
     """
-    Endpoint to fetch all the posts.
-    Reads the posts from the JSON file and returns them as a JSON response.
-    Supports optional sorting by title or content in ascending or descending order.
+        Fetches a list of posts and returns them as JSON.
 
-    Query Parameters:
-        sort (str): The field to sort by ('title' or 'content').
-        direction (str): The sort direction ('asc' or 'desc').
+        This endpoint can also sort the posts based on the specified field and direction.
+        The query parameters `sort` and `direction` are optional:
+        - `sort`: The field by which to sort the posts (e.g., "title", "content"). If not provided, posts are returned unsorted.
+        - `direction`: The direction to sort in. Can be 'asc' (ascending) or 'desc' (descending). Default is 'asc'.
 
-    Returns:
-        Response: JSON array of posts, optionally sorted.
-    """
-    sort_field = request.args.get('sort', '').lower()
-    sort_direction = request.args.get('direction', '').lower()
+        Example usage:
+        - `/api/posts` returns all posts without sorting.
+        - `/api/posts?sort=title&direction=desc` returns posts sorted by the title in descending order.
+
+        Returns:
+            JSON: A list of posts (sorted or unsorted based on query params).
+        """
     posts = read_posts()
 
-    if sort_field and sort_field not in ['title', 'content']:
-        return jsonify({"error": "Error. Valid values are 'title' or 'content'."}), 400
-    if sort_direction and sort_direction not in ['asc', 'desc']:
-        return jsonify({"error": "Error. Valid values are 'asc' or 'desc'."}), 400
+    sort_field = request.args.get('sort', None)
+    sort_direction = request.args.get('direction', 'asc')
 
-    if sort_field and sort_direction:
-        posts = sorted(posts, key=lambda post: post[sort_field].lower(), reverse=(sort_direction == 'desc'))
+    print("Sort field:", sort_field)
+    print("Sort direction:", sort_direction)
+
+    if sort_field:
+        reverse = (sort_direction == 'desc')
+        print("Reverse:", reverse)
+        posts.sort(key=lambda x: x.get(sort_field, ''), reverse=reverse)
 
     return jsonify(posts)
 
@@ -140,16 +141,16 @@ def update_post(id):
 @app.route('/api/posts/<int:id>', methods=['DELETE'])
 def delete_post(id):
     """
-    Endpoint to delete a post by its ID.
-    Removes the post with the given ID from the JSON file.
+        Endpoint to delete a post by its ID.
+        Removes the post with the given ID from the JSON file.
 
-    Args:
-    id (int): ID of the post to be deleted.
+        Args:
+            id (int): ID of the post to be deleted.
 
-    Returns:
-    Response: A success message with a 200 status code.
-    If the post is not found, returns an error with a 404 status code.
-    """
+        Returns:
+            Response: A success message with a 200 status code.
+            If the post is not found, returns an error with a 404 status code.
+        """
     posts = read_posts()
     post = next((post for post in posts if post['id'] == id), None)
     if post is None:
@@ -164,29 +165,36 @@ def delete_post(id):
 @app.route('/api/posts/search', methods=['GET'])
 def search_posts():
     """
-    Endpoint to search for posts by title or content.
-    Accepts search terms via query parameters and returns posts matching the search.
-
+    Search posts by title and/or content.
     Query Parameters:
-        title (str): Search term for the title.
-        content (str): Search term for the content.
+        - title (str): Search term for the title (case-insensitive).
+        - content (str): Search term for the content (case-insensitive).
+    Example usage:
+    - `/api/posts/search?title=first` returns posts with "first" in the title.
+    - `/api/posts/search?content=first` returns posts with "firs" in the content.
+    - `/api/posts/search?title=ffirst&content=first` returns posts that match both the title and content search.
 
     Returns:
-        Response: JSON array of posts matching the search terms.
+        Response: JSON array of matching posts.
     """
-    title_search = request.args.get('title', '').lower()
-    content_search = request.args.get('content', '').lower()
+    title_query = request.args.get('title', '').lower()
+    content_query = request.args.get('content', '').lower()
+
+    if '/' in title_query:
+        title_query = title_query.split('/')[0]
+    if '/' in content_query:
+        content_query = content_query.split('/')[0]
 
     posts = read_posts()
 
-    if title_search or content_search:
-        posts = [
-            post for post in posts
-            if (title_search in post['title'].lower() if title_search else True) or
-               (content_search in post['content'].lower() if content_search else True)
-        ]
+    filtered_posts = [
+        post for post in posts
+        if (title_query in post['title'].lower() if title_query else True) and
+           (content_query in post['content'].lower() if content_query else True)
+    ]
 
-    return jsonify(posts)
+    return jsonify(filtered_posts)
+
 
 if __name__ == '__main__':
     """

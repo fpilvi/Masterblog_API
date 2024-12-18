@@ -1,17 +1,32 @@
 [
     {
         "id": 1,
-        "title": "Hello first Titel ",
-        "content": "Hello first content"
+        "title": "first blog post title",
+        "content": "first blog post content"
     },
     {
         "id": 2,
-        "title": "Hello second Titel ",
-        "content": "Hello second content"
+        "title": "second blog post title",
+        "content": "second blog post content"
     },
     {
         "id": 3,
-        "title": "Hello  third Titel ",
-        "content": "Hello third content"
+        "title": "third blog post title",
+        "content": "third blog post content"
+    },
+    {
+        "id": 4,
+        "title": "fourth blog post title",
+        "content": "fourth blog post content"
+    },
+    {
+        "id": 5,
+        "title": "New test title",
+        "content": "new test content"
+    },
+    {
+        "id": 6,
+        "title": "New new test title",
+        "content": "new new test content"
     }
 ]

@@ -10,39 +10,15 @@
 <body>
     <div class="container">
         <h1>📚 Blog Posts</h1>
-
-        <!-- API Base URL and Load Posts -->
         <div class="input-field">
             <input type="text" id="api-base-url" placeholder="Enter API Base URL" value="http://127.0.0.1:5002/api">
             <button onclick="loadPosts()">Load Posts</button>
         </div>
-
-        <!-- Add Post -->
         <div class="input-field">
             <input type="text" id="post-title" placeholder="Enter Post Title">
             <input type="text" id="post-content" placeholder="Enter Post Content">
             <button onclick="addPost()">Add Post</button>
         </div>
-
-        <!-- Searching -->
-        <div class="input-field">
-            <input type="text" id="search-title" placeholder="Search by title">
-            <input type="text" id="search-content" placeholder="Search by content">
-        </div>
-
-        <!-- Sorting -->
-        <div class="input-field">
-            <select id="sort-field">
-                <option value="title">Title</option>
-                <option value="content">Content</option>
-            </select>
-            <select id="sort-direction">
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-            </select>
-        </div>
-
-        <!-- Posts Container -->
         <div id="post-container">
             <!-- Blog posts will be inserted here by JavaScript -->
         </div>
